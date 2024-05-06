@@ -31,12 +31,9 @@ public class CategoryService:ICategoryService
     }
     public async Task<Response<CategoryDto>> GetByIdAsync(string id)
     {
-        var category = await _categoryCollection.Find<Category>(x => x.Id == id).FirstOrDefaultAsync();
-        if (category is null)
-        {
-            return Response<CategoryDto>.Fail("Category not found",404);
-        }
-
-        return Response<CategoryDto>.Success(_mapper.Map<CategoryDto>(category),200);
+        var category = await _categoryCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        return category is null 
+            ? Response<CategoryDto>.Fail("Category not found",404) 
+            : Response<CategoryDto>.Success(_mapper.Map<CategoryDto>(category),200);
     }
 }

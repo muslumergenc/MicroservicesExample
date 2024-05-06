@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
