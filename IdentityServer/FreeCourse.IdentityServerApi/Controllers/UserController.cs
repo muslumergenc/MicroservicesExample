@@ -1,4 +1,5 @@
-﻿using FreeCourse.IdentityServerApi.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using FreeCourse.IdentityServerApi.Data;
 using FreeCourse.IdentityServerApi.Dtos;
 using FreeCourse.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -24,5 +25,15 @@ public class UserController(UserManager<ApplicationUser> userManager) : Controll
         if (!result.Succeeded)
         { return BadRequest(Response<NoContent>.Fail(result.Errors.Select(x => x.Description).ToList(), 400)); }
         return result.Succeeded ? Ok() : BadRequest();
+    }
+
+    [HttpGet("getuser")]
+    public async Task<IActionResult> GetUser()
+    {
+        var userIdClaim =User.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Name);
+        if (userIdClaim is null) return BadRequest();
+        var user = await userManager.FindByNameAsync(userIdClaim.Value);
+        if (user is null) return BadRequest();
+        return Ok(new { user.Id, user.UserName, user.Email, user.City });
     }
 }

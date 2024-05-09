@@ -22,6 +22,7 @@ public class LoginController(UserManager<ApplicationUser> userManager, SignInMan
         var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
         return result.Succeeded ? Ok(new { token = GenerateJwtToken(user) }) : BadRequest();
     }
+
     private string GenerateJwtToken(ApplicationUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -32,8 +33,10 @@ public class LoginController(UserManager<ApplicationUser> userManager, SignInMan
         var tokenDescriptor = new SecurityTokenDescriptor {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new(ClaimTypes.Name,user.UserName)
+                // new(ClaimTypes.NameIdentifier,user.Id),
+                // new(ClaimTypes.Name,user.UserName),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Name,user.UserName)
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
